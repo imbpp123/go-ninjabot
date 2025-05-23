@@ -16,20 +16,9 @@ import (
 	"github.com/imbpp123/go-ninjabot/tools/log"
 )
 
-type MarginType = futures.MarginType
-
 var (
-	MarginTypeIsolated MarginType = "ISOLATED"
-	MarginTypeCrossed  MarginType = "CROSSED"
-
 	ErrNoNeedChangeMarginType int64 = -4046
 )
-
-type PairOption struct {
-	Pair       string
-	Leverage   int
-	MarginType futures.MarginType
-}
 
 type BinanceFuture struct {
 	ctx        context.Context
@@ -99,7 +88,7 @@ func NewBinanceFuture(ctx context.Context, options ...BinanceFutureOption) (*Bin
 			return nil, err
 		}
 
-		err = exchange.client.NewChangeMarginTypeService().Symbol(option.Pair).MarginType(option.MarginType).Do(ctx)
+		err = exchange.client.NewChangeMarginTypeService().Symbol(option.Pair).MarginType(futures.MarginType(option.MarginType)).Do(ctx)
 		if err != nil {
 			if apiError, ok := err.(*common.APIError); !ok || apiError.Code != ErrNoNeedChangeMarginType {
 				return nil, err
@@ -332,7 +321,7 @@ func (b *BinanceFuture) Orders(pair string, limit int) ([]model.Order, error) {
 
 	orders := make([]model.Order, 0)
 	for _, order := range result {
-		orders = append(orders, newFutureOrder(order))
+		orders = append(orders, newBinanceFutureOrder(order))
 	}
 	return orders, nil
 }
@@ -352,10 +341,10 @@ func (b *BinanceFuture) Order(pair string, id string) (model.Order, error) {
 		return model.Order{}, err
 	}
 
-	return newFutureOrder(order), nil
+	return newBinanceFutureOrder(order), nil
 }
 
-func newFutureOrder(order *futures.Order) model.Order {
+func newBinanceFutureOrder(order *futures.Order) model.Order {
 	var (
 		price float64
 		err   error
@@ -466,7 +455,7 @@ func (b *BinanceFuture) CandlesSubscription(ctx context.Context, pair, period st
 		for {
 			done, _, err := futures.WsKlineServe(pair, period, func(event *futures.WsKlineEvent) {
 				ba.Reset()
-				candle := FutureCandleFromWsKline(pair, event.Kline)
+				candle := BinanceFutureCandleFromWsKline(pair, event.Kline)
 
 				if candle.Complete && b.HeikinAshi {
 					candle = candle.ToHeikinAshi(ha)
@@ -521,7 +510,7 @@ func (b *BinanceFuture) CandlesByLimit(ctx context.Context, pair, period string,
 	}
 
 	for _, d := range data {
-		candle := FutureCandleFromKline(pair, *d)
+		candle := BinanceFutureCandleFromKline(pair, *d)
 
 		if b.HeikinAshi {
 			candle = candle.ToHeikinAshi(ha)
@@ -552,7 +541,7 @@ func (b *BinanceFuture) CandlesByPeriod(ctx context.Context, pair, period string
 	}
 
 	for _, d := range data {
-		candle := FutureCandleFromKline(pair, *d)
+		candle := BinanceFutureCandleFromKline(pair, *d)
 
 		if b.HeikinAshi {
 			candle = candle.ToHeikinAshi(ha)
@@ -564,7 +553,7 @@ func (b *BinanceFuture) CandlesByPeriod(ctx context.Context, pair, period string
 	return candles, nil
 }
 
-func FutureCandleFromKline(pair string, k futures.Kline) model.Candle {
+func BinanceFutureCandleFromKline(pair string, k futures.Kline) model.Candle {
 	var err error
 	t := time.Unix(0, k.OpenTime*int64(time.Millisecond))
 	candle := model.Candle{Pair: pair, Time: t, UpdatedAt: t}
@@ -583,7 +572,7 @@ func FutureCandleFromKline(pair string, k futures.Kline) model.Candle {
 	return candle
 }
 
-func FutureCandleFromWsKline(pair string, k futures.WsKline) model.Candle {
+func BinanceFutureCandleFromWsKline(pair string, k futures.WsKline) model.Candle {
 	var err error
 	t := time.Unix(0, k.StartTime*int64(time.Millisecond))
 	candle := model.Candle{Pair: pair, Time: t, UpdatedAt: t}
