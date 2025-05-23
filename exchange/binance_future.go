@@ -99,28 +99,7 @@ func NewBinanceFuture(ctx context.Context, options ...BinanceFutureOption) (*Bin
 	// Initialize with orders precision and assets limits
 	exchange.assetsInfo = NewAssetInfo()
 	for _, info := range results.Symbols {
-		tradeLimits := model.AssetInfo{
-			BaseAsset:          info.BaseAsset,
-			QuoteAsset:         info.QuoteAsset,
-			BaseAssetPrecision: info.BaseAssetPrecision,
-			QuotePrecision:     info.QuotePrecision,
-		}
-		for _, filter := range info.Filters {
-			if typ, ok := filter["filterType"]; ok {
-				if typ == string(binance.SymbolFilterTypeLotSize) {
-					tradeLimits.MinQuantity, _ = strconv.ParseFloat(filter["minQty"].(string), 64)
-					tradeLimits.MaxQuantity, _ = strconv.ParseFloat(filter["maxQty"].(string), 64)
-					tradeLimits.StepSize, _ = strconv.ParseFloat(filter["stepSize"].(string), 64)
-				}
-
-				if typ == string(binance.SymbolFilterTypePriceFilter) {
-					tradeLimits.MinPrice, _ = strconv.ParseFloat(filter["minPrice"].(string), 64)
-					tradeLimits.MaxPrice, _ = strconv.ParseFloat(filter["maxPrice"].(string), 64)
-					tradeLimits.TickSize, _ = strconv.ParseFloat(filter["tickSize"].(string), 64)
-				}
-			}
-		}
-		exchange.assetsInfo.Set(info.Symbol, tradeLimits)
+		exchange.assetsInfo.Set(info.Symbol, binanceFutureSymbolInfoToAssetInfo(info))
 	}
 
 	log.Info("[SETUP] Using Binance Futures exchange")
@@ -543,6 +522,32 @@ func (b *BinanceFuture) CandlesByPeriod(ctx context.Context, pair, period string
 	}
 
 	return candles, nil
+}
+
+func binanceFutureSymbolInfoToAssetInfo(info futures.Symbol) model.AssetInfo {
+	tradeLimits := model.AssetInfo{
+		BaseAsset:          info.BaseAsset,
+		QuoteAsset:         info.QuoteAsset,
+		BaseAssetPrecision: info.BaseAssetPrecision,
+		QuotePrecision:     info.QuotePrecision,
+	}
+	for _, filter := range info.Filters {
+		if typ, ok := filter["filterType"]; ok {
+			if typ == string(binance.SymbolFilterTypeLotSize) {
+				tradeLimits.MinQuantity, _ = strconv.ParseFloat(filter["minQty"].(string), 64)
+				tradeLimits.MaxQuantity, _ = strconv.ParseFloat(filter["maxQty"].(string), 64)
+				tradeLimits.StepSize, _ = strconv.ParseFloat(filter["stepSize"].(string), 64)
+			}
+
+			if typ == string(binance.SymbolFilterTypePriceFilter) {
+				tradeLimits.MinPrice, _ = strconv.ParseFloat(filter["minPrice"].(string), 64)
+				tradeLimits.MaxPrice, _ = strconv.ParseFloat(filter["maxPrice"].(string), 64)
+				tradeLimits.TickSize, _ = strconv.ParseFloat(filter["tickSize"].(string), 64)
+			}
+		}
+	}
+
+	return tradeLimits
 }
 
 func BinanceFutureCandleFromKline(pair string, k futures.Kline) model.Candle {
