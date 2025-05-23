@@ -15,7 +15,9 @@ type AssetInfo struct {
 }
 
 var (
-	ErrInvalidAsset = errors.New("invalid asset")
+	ErrInvalidAsset    = errors.New("invalid asset")
+	ErrInvalidQuantity = errors.New("invalid quantity")
+	ErrInvalidLeverage = errors.New("invalid leverage")
 )
 
 func NewAssetInfo() *AssetInfo {
@@ -51,6 +53,19 @@ func (a *AssetInfo) ValidateQuantity(pair string, quantity float64) error {
 
 	if quantity > info.MaxQuantity || quantity < info.MinQuantity {
 		return fmt.Errorf("%w: min: %f max: %f", ErrInvalidQuantity, info.MinQuantity, info.MaxQuantity)
+	}
+
+	return nil
+}
+
+func (a *AssetInfo) ValidateLeverage(pair string, leverage float64) error {
+	info, err := a.Get(pair)
+	if err != nil {
+		return fmt.Errorf("validation error: %w", err)
+	}
+
+	if leverage > info.MaxLeverage || leverage < info.MinLeverage {
+		return fmt.Errorf("%w: min: %f max: %f", ErrInvalidLeverage, info.MinLeverage, info.MaxLeverage)
 	}
 
 	return nil

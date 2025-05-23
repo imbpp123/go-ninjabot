@@ -49,6 +49,18 @@ func TestValidateQuantity(t *testing.T) {
 	assert.Error(t, a.ValidateQuantity("BTCUSDT", 10.0))
 }
 
+func TestValidateLeverage(t *testing.T) {
+	a := NewAssetInfo()
+	a.Set("BTCUSDT", model.AssetInfo{
+		MinLeverage: 2,
+		MaxLeverage: 5,
+	})
+
+	assert.NoError(t, a.ValidateLeverage("BTCUSDT", 3))
+	assert.Error(t, a.ValidateLeverage("BTCUSDT", 1))
+	assert.Error(t, a.ValidateLeverage("BTCUSDT", 10.0))
+}
+
 func TestCalculateLotQuantity(t *testing.T) {
 	a := NewAssetInfo()
 	a.Set("BTCUSDT", model.AssetInfo{
@@ -65,7 +77,7 @@ func TestCalculateLotQuantityError(t *testing.T) {
 	a := NewAssetInfo()
 
 	qty, err := a.CalculateLotQuantity("BTCUSDT", 1.234567)
-	assert.NoError(t, err)
+	assert.ErrorIs(t, err, ErrInvalidAsset)
 	assert.Equal(t, 1.234567, qty)
 }
 

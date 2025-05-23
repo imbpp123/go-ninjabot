@@ -36,6 +36,10 @@ type AssetInfo struct {
 	StepSize    float64
 	TickSize    float64
 
+	MinLeverage  float64
+	MaxLeverage  float64
+	LeverageStep float64
+
 	QuotePrecision     int
 	BaseAssetPrecision int
 }

@@ -15,7 +15,6 @@ import (
 )
 
 var (
-	ErrInvalidQuantity   = errors.New("invalid quantity")
 	ErrInsufficientFunds = errors.New("insufficient funds or locked")
 )
 
