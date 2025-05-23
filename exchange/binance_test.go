@@ -10,20 +10,20 @@ import (
 )
 
 func TestFormatQuantity(t *testing.T) {
-	binance := Binance{assetsInfo: map[string]model.AssetInfo{
-		"BTCUSDT": {
-			StepSize:           0.00001000,
-			TickSize:           0.00001000,
-			BaseAssetPrecision: 5,
-			QuotePrecision:     5,
-		},
-		"BATUSDT": {
-			StepSize:           0.01,
-			TickSize:           0.01,
-			BaseAssetPrecision: 2,
-			QuotePrecision:     2,
-		},
-	}}
+	assets := NewAssetInfo()
+	assets.Set("BTCUSDT", model.AssetInfo{
+		StepSize:           0.00001000,
+		TickSize:           0.00001000,
+		BaseAssetPrecision: 5,
+		QuotePrecision:     5,
+	})
+	assets.Set("BATUSDT", model.AssetInfo{
+		StepSize:           0.01,
+		TickSize:           0.01,
+		BaseAssetPrecision: 2,
+		QuotePrecision:     2,
+	})
+	binance := Binance{assetsInfo: assets}
 
 	tt := []struct {
 		pair     string

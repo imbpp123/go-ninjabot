@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/adshao/go-binance/v2"
-	"github.com/adshao/go-binance/v2/common"
 	"github.com/jpillora/backoff"
 	"github.com/samber/lo"
 
@@ -20,7 +19,7 @@ type MetadataFetchers func(pair string, t time.Time) (string, float64)
 type Binance struct {
 	ctx        context.Context
 	client     *binance.Client
-	assetsInfo map[string]model.AssetInfo
+	assetsInfo *AssetInfo
 	HeikinAshi bool
 	Testnet    bool
 
@@ -108,7 +107,7 @@ func NewBinance(ctx context.Context, options ...BinanceOption) (*Binance, error)
 	}
 
 	// Initialize with orders precision and assets limits
-	exchange.assetsInfo = make(map[string]model.AssetInfo)
+	exchange.assetsInfo = NewAssetInfo()
 	for _, info := range results.Symbols {
 		tradeLimits := model.AssetInfo{
 			BaseAsset:          info.BaseAsset,
@@ -131,7 +130,7 @@ func NewBinance(ctx context.Context, options ...BinanceOption) (*Binance, error)
 				}
 			}
 		}
-		exchange.assetsInfo[info.Symbol] = tradeLimits
+		exchange.assetsInfo.Set(info.Symbol, tradeLimits)
 	}
 
 	log.Info("[SETUP] Using Binance exchange")
@@ -148,18 +147,14 @@ func (b *Binance) LastQuote(ctx context.Context, pair string) (float64, error) {
 }
 
 func (b *Binance) AssetsInfo(pair string) model.AssetInfo {
-	return b.assetsInfo[pair]
+	asset, _ := b.assetsInfo.Get(pair)
+	return asset
 }
 
 func (b *Binance) validate(pair string, quantity float64) error {
-	info, ok := b.assetsInfo[pair]
-	if !ok {
-		return ErrInvalidAsset
-	}
-
-	if quantity > info.MaxQuantity || quantity < info.MinQuantity {
+	if err := b.assetsInfo.ValidateQuantity(pair, quantity); err != nil {
 		return &OrderError{
-			Err:      fmt.Errorf("%w: min: %f max: %f", ErrInvalidQuantity, info.MinQuantity, info.MaxQuantity),
+			Err:      err,
 			Pair:     pair,
 			Quantity: quantity,
 		}
@@ -251,17 +246,13 @@ func (b *Binance) CreateOrderStop(pair string, quantity float64, limit float64) 
 }
 
 func (b *Binance) formatPrice(pair string, value float64) string {
-	if info, ok := b.assetsInfo[pair]; ok {
-		value = common.AmountToLotSize(info.TickSize, info.QuotePrecision, value)
-	}
-	return strconv.FormatFloat(value, 'f', -1, 64)
+	lotSize, _ := b.assetsInfo.CalculateLotPrice(pair, value)
+	return strconv.FormatFloat(lotSize, 'f', -1, 64)
 }
 
 func (b *Binance) formatQuantity(pair string, value float64) string {
-	if info, ok := b.assetsInfo[pair]; ok {
-		value = common.AmountToLotSize(info.StepSize, info.BaseAssetPrecision, value)
-	}
-	return strconv.FormatFloat(value, 'f', -1, 64)
+	lotSize, _ := b.assetsInfo.CalculateLotQuantity(pair, value)
+	return strconv.FormatFloat(lotSize, 'f', -1, 64)
 }
 
 func (b *Binance) CreateOrderLimit(side model.SideType, pair string,

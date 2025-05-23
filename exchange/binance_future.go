@@ -23,7 +23,7 @@ var (
 type BinanceFuture struct {
 	ctx        context.Context
 	client     *futures.Client
-	assetsInfo map[string]model.AssetInfo
+	assetsInfo *AssetInfo
 	HeikinAshi bool
 	Testnet    bool
 
@@ -97,7 +97,7 @@ func NewBinanceFuture(ctx context.Context, options ...BinanceFutureOption) (*Bin
 	}
 
 	// Initialize with orders precision and assets limits
-	exchange.assetsInfo = make(map[string]model.AssetInfo)
+	exchange.assetsInfo = NewAssetInfo()
 	for _, info := range results.Symbols {
 		tradeLimits := model.AssetInfo{
 			BaseAsset:          info.BaseAsset,
@@ -120,7 +120,7 @@ func NewBinanceFuture(ctx context.Context, options ...BinanceFutureOption) (*Bin
 				}
 			}
 		}
-		exchange.assetsInfo[info.Symbol] = tradeLimits
+		exchange.assetsInfo.Set(info.Symbol, tradeLimits)
 	}
 
 	log.Info("[SETUP] Using Binance Futures exchange")
@@ -137,18 +137,14 @@ func (b *BinanceFuture) LastQuote(ctx context.Context, pair string) (float64, er
 }
 
 func (b *BinanceFuture) AssetsInfo(pair string) model.AssetInfo {
-	return b.assetsInfo[pair]
+	asset, _ := b.assetsInfo.Get(pair)
+	return asset
 }
 
 func (b *BinanceFuture) validate(pair string, quantity float64) error {
-	info, ok := b.assetsInfo[pair]
-	if !ok {
-		return ErrInvalidAsset
-	}
-
-	if quantity > info.MaxQuantity || quantity < info.MinQuantity {
+	if err := b.assetsInfo.ValidateQuantity(pair, quantity); err != nil {
 		return &OrderError{
-			Err:      fmt.Errorf("%w: min: %f max: %f", ErrInvalidQuantity, info.MinQuantity, info.MaxQuantity),
+			Err:      err,
 			Pair:     pair,
 			Quantity: quantity,
 		}
@@ -196,17 +192,13 @@ func (b *BinanceFuture) CreateOrderStop(pair string, quantity float64, limit flo
 }
 
 func (b *BinanceFuture) formatPrice(pair string, value float64) string {
-	if info, ok := b.assetsInfo[pair]; ok {
-		value = common.AmountToLotSize(info.TickSize, info.QuotePrecision, value)
-	}
-	return strconv.FormatFloat(value, 'f', -1, 64)
+	lotSize, _ := b.assetsInfo.CalculateLotPrice(pair, value)
+	return strconv.FormatFloat(lotSize, 'f', -1, 64)
 }
 
 func (b *BinanceFuture) formatQuantity(pair string, value float64) string {
-	if info, ok := b.assetsInfo[pair]; ok {
-		value = common.AmountToLotSize(info.StepSize, info.BaseAssetPrecision, value)
-	}
-	return strconv.FormatFloat(value, 'f', -1, 64)
+	lotSize, _ := b.assetsInfo.CalculateLotQuantity(pair, value)
+	return strconv.FormatFloat(lotSize, 'f', -1, 64)
 }
 
 func (b *BinanceFuture) CreateOrderLimit(side model.SideType, pair string,

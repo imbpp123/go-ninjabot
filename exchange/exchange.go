@@ -17,7 +17,6 @@ import (
 var (
 	ErrInvalidQuantity   = errors.New("invalid quantity")
 	ErrInsufficientFunds = errors.New("insufficient funds or locked")
-	ErrInvalidAsset      = errors.New("invalid asset")
 )
 
 type DataFeed struct {
