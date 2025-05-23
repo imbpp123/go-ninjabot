@@ -2,7 +2,7 @@
 
 > ⚠️ This is a **community fork** of the [original Ninjabot](https://github.com/rodrigo-brito/ninjabot) project.
 
-The original author is not actively maintaining the project anymore (as of 2024), and since I'm actively working with automated trading systems and deeply interested in this domain, I decided to continue development based on my own needs.
+The original author is not actively maintaining the project anymore (as of 2025), and since I'm actively working with automated trading systems and deeply interested in this domain, I decided to continue development based on my own needs.
 
 This fork will evolve in a more opinionated direction, adapted for my strategies, workflow, and integrations — including possible support for other exchanges like Bybit.
 
