@@ -1,16 +1,15 @@
-package exchange_test
+package exchange
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/imbpp123/go-ninjabot/exchange"
 	"github.com/imbpp123/go-ninjabot/model"
 )
 
 func TestAssetInfoSetGet(t *testing.T) {
-	a := exchange.NewAssetInfo()
+	a := NewAssetInfo()
 	info := model.AssetInfo{
 		BaseAsset:          "BTC",
 		QuoteAsset:         "USDT",
@@ -32,14 +31,14 @@ func TestAssetInfoSetGet(t *testing.T) {
 }
 
 func TestAssetInfoGetInvalid(t *testing.T) {
-	a := exchange.NewAssetInfo()
+	a := NewAssetInfo()
 
 	_, err := a.Get("INVALID")
 	assert.Error(t, err)
 }
 
 func TestValidateQuantity(t *testing.T) {
-	a := exchange.NewAssetInfo()
+	a := NewAssetInfo()
 	a.Set("BTCUSDT", model.AssetInfo{
 		MinQuantity: 0.01,
 		MaxQuantity: 5.0,
@@ -51,7 +50,7 @@ func TestValidateQuantity(t *testing.T) {
 }
 
 func TestCalculateLotQuantity(t *testing.T) {
-	a := exchange.NewAssetInfo()
+	a := NewAssetInfo()
 	a.Set("BTCUSDT", model.AssetInfo{
 		StepSize:           0.001,
 		BaseAssetPrecision: 6,
@@ -62,8 +61,16 @@ func TestCalculateLotQuantity(t *testing.T) {
 	assert.Equal(t, 1.234, qty)
 }
 
+func TestCalculateLotQuantityError(t *testing.T) {
+	a := NewAssetInfo()
+
+	qty, err := a.CalculateLotQuantity("BTCUSDT", 1.234567)
+	assert.NoError(t, err)
+	assert.Equal(t, 1.234567, qty)
+}
+
 func TestCalculateLotPrice(t *testing.T) {
-	a := exchange.NewAssetInfo()
+	a := NewAssetInfo()
 	a.Set("BTCUSDT", model.AssetInfo{
 		TickSize:       0.01,
 		QuotePrecision: 2,
@@ -72,4 +79,12 @@ func TestCalculateLotPrice(t *testing.T) {
 	price, err := a.CalculateLotPrice("BTCUSDT", 1234.5678)
 	assert.NoError(t, err)
 	assert.Equal(t, 1234.56, price)
+}
+
+func TestCalculateLotPriceError(t *testing.T) {
+	a := NewAssetInfo()
+
+	price, err := a.CalculateLotPrice("BTCUSDT", 1234.5678)
+	assert.ErrorIs(t, err, ErrInvalidAsset)
+	assert.Equal(t, 1234.5678, price)
 }
