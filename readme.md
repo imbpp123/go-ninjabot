@@ -1,14 +1,12 @@
-![Ninjabot](https://user-images.githubusercontent.com/7620947/161434011-adc89d1a-dccb-45a7-8a07-2bb55e62d2d9.png)
+![Ninjabot Fork](https://user-images.githubusercontent.com/7620947/161434011-adc89d1a-dccb-45a7-8a07-2bb55e62d2d9.png)
 
-[![tests](https://github.com/imbpp123/go-ninjabot/actions/workflows/ci.yaml/badge.svg)](https://github.com/imbpp123/go-ninjabot/actions/workflows/ci.yaml)
-[![codecov](https://codecov.io/gh/rodrigo-brito/ninjabot/branch/main/graph/badge.svg)](https://codecov.io/gh/rodrigo-brito/ninjabot)
-[![Go Reference](https://pkg.go.dev/badge/github.com/imbpp123/go-ninjabot.svg)](https://pkg.go.dev/github.com/imbpp123/go-ninjabot)
-[![Discord](https://img.shields.io/discord/960156400376483840?color=5865F2&label=discord)](https://discord.gg/TGCrUH972E)
-[![Discord](https://img.shields.io/badge/donate-patreon-red)](https://www.patreon.com/ninjabot_github)
+> ⚠️ This is a **community fork** of the [original Ninjabot](https://github.com/rodrigo-brito/ninjabot) project.
 
-A fast cryptocurrency trading bot framework implemented in Go. Ninjabot permits users to create and test custom strategies for sport and future markets. 
+The original author is not actively maintaining the project anymore (as of 2024), and since I'm actively working with automated trading systems and deeply interested in this domain, I decided to continue development based on my own needs.
 
-Docs: https://rodrigo-brito.github.io/ninjabot/
+This fork will evolve in a more opinionated direction, adapted for my strategies, workflow, and integrations — including possible support for other exchanges like Bybit.
+
+If you're looking for the original version of the project, please refer to [rodrigo-brito/ninjabot](https://github.com/rodrigo-brito/ninjabot).
 
 | DISCLAIMER                                                                                                                                                                                                           |
 |----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
