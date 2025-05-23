@@ -1,4 +1,4 @@
-module github.com/rodrigo-brito/ninjabot
+module github.com/imbpp123/go-ninjabot
 
 go 1.18
 
