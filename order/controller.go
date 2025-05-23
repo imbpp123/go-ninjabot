@@ -437,7 +437,7 @@ func (c *Controller) PositionValue(pair string) (float64, error) {
 	return asset * c.lastPrice[pair], nil
 }
 
-func (c *Controller) Order(pair string, id int64) (model.Order, error) {
+func (c *Controller) Order(pair string, id string) (model.Order, error) {
 	return c.exchange.Order(pair, id)
 }
 

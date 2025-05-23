@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/adshao/go-binance/v2/common"
+	"github.com/google/uuid"
 
 	"github.com/imbpp123/go-ninjabot/model"
 	"github.com/imbpp123/go-ninjabot/service"
@@ -30,7 +31,6 @@ type PaperWallet struct {
 	sync.Mutex
 	ctx           context.Context
 	baseCoin      string
-	counter       int64
 	takerFee      float64
 	makerFee      float64
 	initialValue  float64
@@ -110,9 +110,8 @@ func NewPaperWallet(ctx context.Context, baseCoin string, options ...PaperWallet
 	return &wallet
 }
 
-func (p *PaperWallet) ID() int64 {
-	p.counter++
-	return p.counter
+func (p *PaperWallet) ID() string {
+	return uuid.New().String()
 }
 
 func (p *PaperWallet) Pairs() []string {
@@ -688,7 +687,7 @@ func (p *PaperWallet) Cancel(order model.Order) error {
 	return nil
 }
 
-func (p *PaperWallet) Order(_ string, id int64) (model.Order, error) {
+func (p *PaperWallet) Order(_ string, id string) (model.Order, error) {
 	for _, order := range p.orders {
 		if order.ExchangeID == id {
 			return order, nil

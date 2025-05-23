@@ -9,6 +9,7 @@ import (
 	"github.com/adshao/go-binance/v2"
 	"github.com/adshao/go-binance/v2/common"
 	"github.com/jpillora/backoff"
+	"github.com/samber/lo"
 
 	"github.com/imbpp123/go-ninjabot/model"
 	"github.com/imbpp123/go-ninjabot/tools/log"
@@ -194,7 +195,7 @@ func (b *Binance) CreateOrderOCO(side model.SideType, pair string,
 		price, _ := strconv.ParseFloat(order.Price, 64)
 		quantity, _ := strconv.ParseFloat(order.OrigQuantity, 64)
 		item := model.Order{
-			ExchangeID: order.OrderID,
+			ExchangeID: strconv.FormatInt(order.OrderID, 10),
 			CreatedAt:  time.Unix(0, ocoOrder.TransactionTime*int64(time.Millisecond)),
 			UpdatedAt:  time.Unix(0, ocoOrder.TransactionTime*int64(time.Millisecond)),
 			Pair:       pair,
@@ -203,7 +204,7 @@ func (b *Binance) CreateOrderOCO(side model.SideType, pair string,
 			Status:     model.OrderStatusType(order.Status),
 			Price:      price,
 			Quantity:   quantity,
-			GroupID:    &order.OrderListID,
+			GroupID:    lo.ToPtr(strconv.FormatInt(order.OrderListID, 10)),
 		}
 
 		if item.Type == model.OrderTypeStopLossLimit || item.Type == model.OrderTypeStopLoss {
@@ -237,7 +238,7 @@ func (b *Binance) CreateOrderStop(pair string, quantity float64, limit float64) 
 	quantity, _ = strconv.ParseFloat(order.OrigQuantity, 64)
 
 	return model.Order{
-		ExchangeID: order.OrderID,
+		ExchangeID: strconv.FormatInt(order.OrderID, 10),
 		CreatedAt:  time.Unix(0, order.TransactTime*int64(time.Millisecond)),
 		UpdatedAt:  time.Unix(0, order.TransactTime*int64(time.Millisecond)),
 		Pair:       pair,
@@ -294,7 +295,7 @@ func (b *Binance) CreateOrderLimit(side model.SideType, pair string,
 	}
 
 	return model.Order{
-		ExchangeID: order.OrderID,
+		ExchangeID: strconv.FormatInt(order.OrderID, 10),
 		CreatedAt:  time.Unix(0, order.TransactTime*int64(time.Millisecond)),
 		UpdatedAt:  time.Unix(0, order.TransactTime*int64(time.Millisecond)),
 		Pair:       pair,
@@ -334,7 +335,7 @@ func (b *Binance) CreateOrderMarket(side model.SideType, pair string, quantity f
 	}
 
 	return model.Order{
-		ExchangeID: order.OrderID,
+		ExchangeID: strconv.FormatInt(order.OrderID, 10),
 		CreatedAt:  time.Unix(0, order.TransactTime*int64(time.Millisecond)),
 		UpdatedAt:  time.Unix(0, order.TransactTime*int64(time.Millisecond)),
 		Pair:       order.Symbol,
@@ -374,7 +375,7 @@ func (b *Binance) CreateOrderMarketQuote(side model.SideType, pair string, quant
 	}
 
 	return model.Order{
-		ExchangeID: order.OrderID,
+		ExchangeID: strconv.FormatInt(order.OrderID, 10),
 		CreatedAt:  time.Unix(0, order.TransactTime*int64(time.Millisecond)),
 		UpdatedAt:  time.Unix(0, order.TransactTime*int64(time.Millisecond)),
 		Pair:       order.Symbol,
@@ -387,9 +388,14 @@ func (b *Binance) CreateOrderMarketQuote(side model.SideType, pair string, quant
 }
 
 func (b *Binance) Cancel(order model.Order) error {
-	_, err := b.client.NewCancelOrderService().
+	exchangeID, err := strconv.ParseInt(order.ExchangeID, 10, 64)
+	if err != nil {
+		return err
+	}
+
+	_, err = b.client.NewCancelOrderService().
 		Symbol(order.Pair).
-		OrderID(order.ExchangeID).
+		OrderID(exchangeID).
 		Do(b.ctx)
 	return err
 }
@@ -411,10 +417,15 @@ func (b *Binance) Orders(pair string, limit int) ([]model.Order, error) {
 	return orders, nil
 }
 
-func (b *Binance) Order(pair string, id int64) (model.Order, error) {
+func (b *Binance) Order(pair string, id string) (model.Order, error) {
+	idNum, err := strconv.ParseInt(id, 10, 64)
+	if err != nil {
+		return model.Order{}, err
+	}
+
 	order, err := b.client.NewGetOrderService().
 		Symbol(pair).
-		OrderID(id).
+		OrderID(idNum).
 		Do(b.ctx)
 
 	if err != nil {
@@ -436,7 +447,7 @@ func newOrder(order *binance.Order) model.Order {
 	}
 
 	return model.Order{
-		ExchangeID: order.OrderID,
+		ExchangeID: strconv.FormatInt(order.OrderID, 10),
 		Pair:       order.Symbol,
 		CreatedAt:  time.Unix(0, order.Time*int64(time.Millisecond)),
 		UpdatedAt:  time.Unix(0, order.UpdateTime*int64(time.Millisecond)),

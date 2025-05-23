@@ -10,7 +10,7 @@ import (
 func TestOrder_String(t *testing.T) {
 	order := Order{
 		ID:         1,
-		ExchangeID: 2,
+		ExchangeID: "2",
 		Pair:       "BNBUSDT",
 		Side:       SideTypeSell,
 		Type:       OrderTypeLimit,

@@ -13,7 +13,7 @@ func storageUseCase(repo Storage, t *testing.T) {
 	now := time.Now()
 
 	firstOrder := &model.Order{
-		ExchangeID: 1,
+		ExchangeID: "1",
 		Pair:       "BTCUSDT",
 		Side:       model.SideTypeBuy,
 		Type:       model.OrderTypeLimit,
@@ -27,7 +27,7 @@ func storageUseCase(repo Storage, t *testing.T) {
 	require.NoError(t, err)
 
 	secondOrder := &model.Order{
-		ExchangeID: 2,
+		ExchangeID: "2",
 		Pair:       "ETHUSDT",
 		Side:       model.SideTypeBuy,
 		Type:       model.OrderTypeLimit,
@@ -44,15 +44,15 @@ func storageUseCase(repo Storage, t *testing.T) {
 		orders, err := repo.Orders(WithUpdateAtBeforeOrEqual(now))
 		require.NoError(t, err)
 		require.Len(t, orders, 1)
-		require.Equal(t, orders[0].ExchangeID, int64(1))
+		require.Equal(t, orders[0].ExchangeID, "1")
 	})
 
 	t.Run("get all", func(t *testing.T) {
 		orders, err := repo.Orders()
 		require.NoError(t, err)
 		require.Len(t, orders, 2)
-		require.Equal(t, orders[0].ExchangeID, int64(1))
-		require.Equal(t, orders[1].ExchangeID, int64(2))
+		require.Equal(t, orders[0].ExchangeID, "1")
+		require.Equal(t, orders[1].ExchangeID, "2")
 	})
 
 	t.Run("pair filter", func(t *testing.T) {

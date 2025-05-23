@@ -318,7 +318,6 @@ func TestPaperWallet_Order(t *testing.T) {
 	wallet := NewPaperWallet(context.Background(), "USDT", WithPaperAsset("USDT", 100))
 	expectOrder, err := wallet.CreateOrderMarket(model.SideTypeBuy, "BTCUSDT", 1)
 	require.NoError(t, err)
-	require.Equal(t, int64(1), expectOrder.ExchangeID)
 
 	order, err := wallet.Order("BTCUSDT", expectOrder.ExchangeID)
 	require.NoError(t, err)

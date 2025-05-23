@@ -194,7 +194,7 @@ func (b *BinanceFuture) CreateOrderStop(pair string, quantity float64, limit flo
 	quantity, _ = strconv.ParseFloat(order.OrigQuantity, 64)
 
 	return model.Order{
-		ExchangeID: order.OrderID,
+		ExchangeID: strconv.FormatInt(order.OrderID, 10),
 		CreatedAt:  time.Unix(0, order.UpdateTime*int64(time.Millisecond)),
 		UpdatedAt:  time.Unix(0, order.UpdateTime*int64(time.Millisecond)),
 		Pair:       pair,
@@ -251,7 +251,7 @@ func (b *BinanceFuture) CreateOrderLimit(side model.SideType, pair string,
 	}
 
 	return model.Order{
-		ExchangeID: order.OrderID,
+		ExchangeID: strconv.FormatInt(order.OrderID, 10),
 		CreatedAt:  time.Unix(0, order.UpdateTime*int64(time.Millisecond)),
 		UpdatedAt:  time.Unix(0, order.UpdateTime*int64(time.Millisecond)),
 		Pair:       pair,
@@ -291,7 +291,7 @@ func (b *BinanceFuture) CreateOrderMarket(side model.SideType, pair string, quan
 	}
 
 	return model.Order{
-		ExchangeID: order.OrderID,
+		ExchangeID: strconv.FormatInt(order.OrderID, 10),
 		CreatedAt:  time.Unix(0, order.UpdateTime*int64(time.Millisecond)),
 		UpdatedAt:  time.Unix(0, order.UpdateTime*int64(time.Millisecond)),
 		Pair:       order.Symbol,
@@ -308,9 +308,14 @@ func (b *BinanceFuture) CreateOrderMarketQuote(_ model.SideType, _ string, _ flo
 }
 
 func (b *BinanceFuture) Cancel(order model.Order) error {
-	_, err := b.client.NewCancelOrderService().
+	exchangeID, err := strconv.ParseInt(order.ExchangeID, 10, 64)
+	if err != nil {
+		return err
+	}
+
+	_, err = b.client.NewCancelOrderService().
 		Symbol(order.Pair).
-		OrderID(order.ExchangeID).
+		OrderID(exchangeID).
 		Do(b.ctx)
 	return err
 }
@@ -332,10 +337,15 @@ func (b *BinanceFuture) Orders(pair string, limit int) ([]model.Order, error) {
 	return orders, nil
 }
 
-func (b *BinanceFuture) Order(pair string, id int64) (model.Order, error) {
+func (b *BinanceFuture) Order(pair string, id string) (model.Order, error) {
+	idNum, err := strconv.ParseInt(id, 10, 64)
+	if err != nil {
+		return model.Order{}, err
+	}
+
 	order, err := b.client.NewGetOrderService().
 		Symbol(pair).
-		OrderID(id).
+		OrderID(idNum).
 		Do(b.ctx)
 
 	if err != nil {
@@ -362,7 +372,7 @@ func newFutureOrder(order *futures.Order) model.Order {
 	}
 
 	return model.Order{
-		ExchangeID: order.OrderID,
+		ExchangeID: strconv.FormatInt(order.OrderID, 10),
 		Pair:       order.Symbol,
 		CreatedAt:  time.Unix(0, order.Time*int64(time.Millisecond)),
 		UpdatedAt:  time.Unix(0, order.UpdateTime*int64(time.Millisecond)),

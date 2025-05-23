@@ -25,7 +25,7 @@ type Feeder interface {
 type Broker interface {
 	Account() (model.Account, error)
 	Position(pair string) (asset, quote float64, err error)
-	Order(pair string, id int64) (model.Order, error)
+	Order(pair string, id string) (model.Order, error)
 	CreateOrderOCO(side model.SideType, pair string, size, price, stop, stopLimit float64) ([]model.Order, error)
 	CreateOrderLimit(side model.SideType, pair string, size float64, limit float64) (model.Order, error)
 	CreateOrderMarket(side model.SideType, pair string, size float64) (model.Order, error)

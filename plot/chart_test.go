@@ -30,7 +30,7 @@ func TestChart_CandleAndOrder(t *testing.T) {
 
 	order := model.Order{
 		ID:         1,
-		ExchangeID: 1,
+		ExchangeID: "1",
 		Pair:       "ETHUSDT",
 		Side:       "BUY",
 		Type:       "MARKET",
@@ -60,10 +60,10 @@ func TestChart_CandleAndOrder(t *testing.T) {
 	}
 	c.OnCandle(candle2)
 
-	groupID := int64(3)
+	groupID := "3"
 	limitMakerOrder := model.Order{
 		ID:         3,
-		ExchangeID: 3,
+		ExchangeID: "3",
 		CreatedAt:  time.Date(2021, 9, 28, 8, 0, 0, 0, time.UTC),
 		UpdatedAt:  time.Date(2021, 9, 28, 8, 0, 0, 0, time.UTC),
 		Pair:       pair,
@@ -81,7 +81,7 @@ func TestChart_CandleAndOrder(t *testing.T) {
 	stop := 2900.00
 	stopOrder := model.Order{
 		ID:         4,
-		ExchangeID: 3,
+		ExchangeID: "3",
 		CreatedAt:  time.Date(2021, 9, 28, 8, 0, 0, 0, time.UTC),
 		UpdatedAt:  time.Date(2021, 9, 28, 8, 0, 0, 0, time.UTC),
 		Pair:       pair,
