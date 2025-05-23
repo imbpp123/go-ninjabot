@@ -1,7 +1,7 @@
 package ninjabot
 
 import (
-	"github.com/rodrigo-brito/ninjabot/model"
+	"github.com/imbpp123/go-ninjabot/model"
 )
 
 type (

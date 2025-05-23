@@ -4,8 +4,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/rodrigo-brito/ninjabot/exchange"
-	"github.com/rodrigo-brito/ninjabot/model"
+	"github.com/imbpp123/go-ninjabot/exchange"
+	"github.com/imbpp123/go-ninjabot/model"
 
 	"github.com/StudioSol/set"
 	"github.com/stretchr/testify/require"

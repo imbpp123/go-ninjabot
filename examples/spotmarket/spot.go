@@ -6,9 +6,9 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/rodrigo-brito/ninjabot"
-	"github.com/rodrigo-brito/ninjabot/examples/strategies"
-	"github.com/rodrigo-brito/ninjabot/exchange"
+	"github.com/imbpp123/go-ninjabot"
+	"github.com/imbpp123/go-ninjabot/examples/strategies"
+	"github.com/imbpp123/go-ninjabot/exchange"
 )
 
 // This example shows how to use spot market with NinjaBot in Binance

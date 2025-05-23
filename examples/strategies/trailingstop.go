@@ -1,13 +1,13 @@
 package strategies
 
 import (
-	"github.com/rodrigo-brito/ninjabot"
-	"github.com/rodrigo-brito/ninjabot/indicator"
-	"github.com/rodrigo-brito/ninjabot/model"
-	"github.com/rodrigo-brito/ninjabot/service"
-	"github.com/rodrigo-brito/ninjabot/strategy"
-	"github.com/rodrigo-brito/ninjabot/tools"
-	"github.com/rodrigo-brito/ninjabot/tools/log"
+	"github.com/imbpp123/go-ninjabot"
+	"github.com/imbpp123/go-ninjabot/indicator"
+	"github.com/imbpp123/go-ninjabot/model"
+	"github.com/imbpp123/go-ninjabot/service"
+	"github.com/imbpp123/go-ninjabot/strategy"
+	"github.com/imbpp123/go-ninjabot/tools"
+	"github.com/imbpp123/go-ninjabot/tools/log"
 )
 
 type trailing struct {

@@ -4,15 +4,15 @@ import (
 	"context"
 	"testing"
 
-	"github.com/rodrigo-brito/ninjabot/strategy"
+	"github.com/imbpp123/go-ninjabot/strategy"
 
 	"github.com/markcheno/go-talib"
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 
-	"github.com/rodrigo-brito/ninjabot/exchange"
-	"github.com/rodrigo-brito/ninjabot/service"
-	"github.com/rodrigo-brito/ninjabot/storage"
+	"github.com/imbpp123/go-ninjabot/exchange"
+	"github.com/imbpp123/go-ninjabot/service"
+	"github.com/imbpp123/go-ninjabot/storage"
 )
 
 type fakeStrategy struct{}
