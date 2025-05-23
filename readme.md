@@ -116,13 +116,3 @@ Chart available at http://localhost:8080
 ### Exchanges
 
 Currently, we only support [Binance](https://www.binance.com/en?ref=35723227) exchange. If you want to include support for other exchanges, you need to implement a new `struct` that implements the interface `Exchange`. You can check some examples in [exchange](./pkg/exchange) directory.
-
-### Support the project
-
-|  | Address  |
-| --- | --- |
-|**BTC** | `bc1qpk6yqju6rkz33ntzj8kuepmynmztzydmec2zm4`|
-|**ETH** | `0x2226FFe4aBD2Afa84bf7222C2b17BBC65F64555A` |
-|**LTC** | `ltc1qj2n9r4yfsm5dnsmmtzhgj8qcj8fjpcvgkd9v3j` |
-
-**Patreon**: https://www.patreon.com/ninjabot_github
